@@ -28,7 +28,6 @@ class MainPage(Screen):
         port = 10001
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((host, port))
-            # s.sendall(b'Hello, world')
             while True:
                 # s.sendall(b'Hello, world')
                 data = s.recv(1024)
@@ -36,21 +35,21 @@ class MainPage(Screen):
 
     def test1(self):
         if self.first is True:
-            s.send(b'a')
+            s.sendall(b'a')
             print('a')
             self.first = False
         elif self.first is False:
-            s.send(b'b')
+            s.sendall(b'b')
             print('b')
             self.first = True
 
     def test2(self):
         if self.second is True:
-            s.send(b'c')
+            s.sendall(b'c')
             print('c')
             self.second = False
         elif self.second is False:
-            s.send(b'd')
+            s.sendall(b'd')
             print('d')
             self.second = True
 

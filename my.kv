@@ -1,4 +1,5 @@
 #:import NoTransition kivy.uix.screenmanager.NoTransition
+#:set color [255, .5, .5, 1]
 
 <Label>
     size_hint: 0.1,0.1
@@ -19,6 +20,9 @@ ScreenManager:
         name: 'mainpage'
         id: main
         box: box
+        status: status
+        led_1: 255,.5,.5, 1
+        led_2: 255,.5,.5, 1
         canvas.before:
             Color:
                 rgba: (1, 1, 1, 1)
@@ -29,28 +33,46 @@ ScreenManager:
         FloatLayout:
             Label:
                 text: "URL:"
-                font_size: 19
-                pos_hint: {"x": 0.2, "y": 0.775}
+                font_size: 24
+                pos_hint: {"x": 0.165, "y": 0.8}
             TextInput:
                 id: box
                 text: ""
                 multiline: False
-                size_hint: 0.5,0.05
-                pos_hint: {"x": 0.3, "y": 0.8}
+                size_hint: 0.5,0.1
+                pos_hint: {"x": 0.265, "y": 0.8}
             Button:
                 text:"Enter"
-                size_hint: 0.1,0.06
-                pos_hint: {"x": 0.82, "y": 0.795}
+                size_hint: 0.1,0.1
+                pos_hint: {"x": 0.785, "y": 0.8}
                 on_release:
                     main.tcp()
 
+            Image:
+                id: status
+                source: "cross.png"
+                size_hint: 0.1,0.1
+                pos_hint: {"x": 0.885, "y": 0.8}
+
             Button:
+                canvas.before:
+                    Color:
+                        rgba: main.led_1
+                    Line:
+                        width: 3
+                        rectangle: self.x, self.y, self.width, self.height
                 text:"LED1"
                 size_hint: 0.4,0.4
                 pos_hint: {"x": 0.05, "y": 0.2}
                 on_release:
                     main.test1()
             Button:
+                canvas.before:
+                    Color:
+                        rgba: main.led_2
+                    Line:
+                        width: 3
+                        rectangle: self.x, self.y, self.width, self.height
                 text:"LED2"
                 size_hint: 0.4,0.4
                 pos_hint: {"x": 0.55, "y": 0.2}

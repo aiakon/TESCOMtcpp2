@@ -55,28 +55,258 @@ ScreenManager:
                 pos_hint: {"x": 0.885, "y": 0.8}
 
             Button:
-                canvas.before:
-                    Color:
-                        rgba: main.led_1
-                    Line:
-                        width: 3
-                        rectangle: self.x, self.y, self.width, self.height
-                text:"LED1"
-                size_hint: 0.4,0.4
-                pos_hint: {"x": 0.05, "y": 0.2}
+                text:"Offline"
+                size_hint: 0.2,0.1
+                pos_hint: {"x": 0.385, "y": 0.4}
                 on_release:
-                    main.test1()
+                    app.root.current = 'controlpage'
+
+    ControlPage:
+        name: 'controlpage'
+        id: control
+        canvas.before:
+            Color:
+                rgba: (1, 1, 1, 1)
+            Rectangle:
+                pos:self.pos
+                size:self.size
+
+        FloatLayout:
             Button:
-                canvas.before:
-                    Color:
-                        rgba: main.led_2
-                    Line:
-                        width: 3
-                        rectangle: self.x, self.y, self.width, self.height
-                text:"LED2"
-                size_hint: 0.4,0.4
-                pos_hint: {"x": 0.55, "y": 0.2}
+                text:"Master" # tüm on/off ları aynı anda açıp kapatıyor.
+                size_hint: 0.25,0.333
+                pos_hint: {"x": 0, "y": 0.666}
                 on_release:
-                    main.test2()
+                    app.root.current = 'controlpage'
+            Button:
+                text:" "
+                size_hint: 0.25,0.333
+                pos_hint: {"x": 0, "y": 0.333}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:" "
+                size_hint: 0.25,0.333
+                pos_hint: {"x": 0, "y": 0}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"ON/OFF"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.25, "y": 0.8325}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"1,5A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.375, "y": 0.8325}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"3A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.5, "y": 0.8325}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"6A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.625, "y": 0.8325}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"9A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.75, "y": 0.8325}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"12A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.875, "y": 0.8325}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"32A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.25, "y": 0.666}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"4A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.375, "y": 0.666}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"8A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.5, "y": 0.666}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"15A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.625, "y": 0.666}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"22A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.75, "y": 0.666}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"42A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.875, "y": 0.666}
+                on_release:
+                    app.root.current = 'controlpage'
 
 
+            Button:
+                text:"ON/OFF"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.25, "y": 0.4995}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"1,5A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.375, "y": 0.4995}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"3A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.5, "y": 0.4995}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"6A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.625, "y": 0.4995}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"9A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.75, "y": 0.4995}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"12A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.875, "y": 0.4995}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"32A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.25, "y": 0.333}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"4A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.375, "y": 0.333}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"8A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.5, "y": 0.333}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"15A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.625, "y": 0.333}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"22A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.75, "y": 0.333}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"42A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.875, "y": 0.333}
+                on_release:
+                    app.root.current = 'controlpage'
+
+
+            Button:
+                text:"ON/OFF"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.25, "y": 0.1665}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"1,5A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.375, "y": 0.1665}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"3A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.5, "y": 0.1665}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"6A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.625, "y": 0.1665}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"9A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.75, "y": 0.1665}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"12A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.875, "y": 0.1665}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"32A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.25, "y": 0}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"4A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.375, "y": 0}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"8A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.5, "y": 0}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"15A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.625, "y": 0}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"22A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.75, "y": 0}
+                on_release:
+                    app.root.current = 'controlpage'
+            Button:
+                text:"42A"
+                size_hint: 0.125,0.1665
+                pos_hint: {"x": 0.875, "y": 0}
+                on_release:
+                    app.root.current = 'controlpage'

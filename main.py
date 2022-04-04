@@ -42,8 +42,9 @@ class MainPage(Screen):
             port = 10001
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.connect((host, port))
-                Clock.schedule_once(self.tick)
-                f = open("ip.txt", "w")
+                # Eğer sorunsuz bağlandıysa
+                Clock.schedule_once(self.tick)  # tik işareti koy.
+                f = open("ip.txt", "w")     # ip adresini kaydet.
                 f.write(self.box.text)
                 f.close()
                 while True:
@@ -54,7 +55,7 @@ class MainPage(Screen):
                     time.sleep(0.1)
             Clock.schedule_once(self.cross)
         except:
-            print("hülele")
+            print("test")
 
     def test1(self):
         if self.first is True:
@@ -79,6 +80,9 @@ class MainPage(Screen):
             s.sendall(b'd')
             print('d')
             self.second = True
+
+class ControlPage(Screen):
+        pass
 
 
 class MyApp(App):

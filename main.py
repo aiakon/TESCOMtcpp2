@@ -14,6 +14,10 @@ from datetime import datetime
 import socket
 
 
+green = (.5, 255, .5, 1)
+red = (255, .5, .5, 1)
+
+
 class MainPage(Screen):
     first = True
     second = True
@@ -26,12 +30,13 @@ class MainPage(Screen):
 
     def tick(self, dt):
         self.status.source = "tick.png"
+        self.status2.source = "tick.png"
 
     def cross(self,dt):
         self.status.source = "cross.png"
+        self.status2.source = "cross.png"
 
     def tcp(self, *args):
-
         y = threading.Thread(target=self.tcpthread, daemon=True)  # Setup thread
         y.start()  # Starts thread
 
@@ -49,41 +54,41 @@ class MainPage(Screen):
                 f.close()
                 while True:
                     data = s.recv(1024)
+                    print(data)
                     datastr = data.decode("utf-8")
+
+                    if 'a' in datastr:
+                        self.onf.background_color = green
+                    elif 'A' in datastr:
+                        self.onf.background_color = red
+
+                    if 'b' in datastr:
+                        self.bir.background_color = green
+                    elif 'B' in datastr:
+                        self.bir.background_color = red
+
+                    if 'c' in datastr:
+                        self.iki.background_color = green
+                    elif 'C' in datastr:
+                        self.iki.background_color = red
+
                     if datastr == '':
                         break
                     time.sleep(0.1)
             Clock.schedule_once(self.cross)
-        except:
-            print("test")
+        except Exception as e:
+            print("crash", e)
 
-    def test1(self):
-        if self.first is True:
-            self.led_1 = (.5, 255, .5, 1)
-            s.sendall(b'a')
-            print('a')
-            self.first = False
-        elif self.first is False:
-            self.led_1 = (255, .5, .5, 1)
-            s.sendall(b'b')
-            print('b')
-            self.first = True
-
-    def test2(self):
-        if self.second is True:
-            self.led_2 = (.5, 255, .5, 1)
-            s.sendall(b'c')
-            print('c')
-            self.second = False
-        elif self.second is False:
-            self.led_2 = (255, .5, .5, 1)
-            s.sendall(b'd')
-            print('d')
-            self.second = True
 
 class ControlPage(Screen):
-        pass
 
+    def send(self, x):
+        try:
+            s.sendall(bytes(x, 'utf-8'))
+
+        except Exception as e:
+            self.status2.source = "cross.png"
+            print("fail,", e)
 
 class MyApp(App):
     pass

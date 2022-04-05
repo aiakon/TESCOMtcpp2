@@ -1,15 +1,15 @@
 #:import NoTransition kivy.uix.screenmanager.NoTransition
-#:set color [255, .5, .5, 1]
+#:set red [255, 0.5, 0.5, 1]
+#:set green [0.5, 255, 0.5, 1]
+#:set default [1, 1, 1, 0.95]
 
 <Label>
     size_hint: 0.1,0.1
     font_size:17
     color: 0,0,0,1
-<ProgressBar>
-    min:0
-    max:100
 <Button>
     size_hint:0.26,0.1
+    background_color: default
 
 ScreenManager:
     transition: NoTransition()
@@ -19,10 +19,17 @@ ScreenManager:
     MainPage:
         name: 'mainpage'
         id: main
+
+        # Mainpage IDs
         box: box
         status: status
-        led_1: 255,.5,.5, 1
-        led_2: 255,.5,.5, 1
+        status2: status2
+
+        # Controlpage IDs
+        onf: onf
+        bir: bir
+        iki: iki
+
         canvas.before:
             Color:
                 rgba: (1, 1, 1, 1)
@@ -32,11 +39,12 @@ ScreenManager:
 
         FloatLayout:
             Label:
-                text: "URL:"
+                text: "IP:"
                 font_size: 24
                 pos_hint: {"x": 0.165, "y": 0.8}
             TextInput:
                 id: box
+                font_size: 24
                 text: ""
                 multiline: False
                 size_hint: 0.5,0.1
@@ -46,6 +54,7 @@ ScreenManager:
                 size_hint: 0.1,0.1
                 pos_hint: {"x": 0.785, "y": 0.8}
                 on_release:
+                    # app.root.current = 'controlpage'
                     main.tcp()
 
             Image:
@@ -61,9 +70,13 @@ ScreenManager:
                 on_release:
                     app.root.current = 'controlpage'
 
+#############################################################################
+
     ControlPage:
         name: 'controlpage'
         id: control
+        status2: status2
+
         canvas.before:
             Color:
                 rgba: (1, 1, 1, 1)
@@ -73,17 +86,16 @@ ScreenManager:
 
         FloatLayout:
             Button:
-                text:"Master" # tüm on/off ları aynı anda açıp kapatıyor.
+                text:" Master\nON/OFF" # tüm on/off ları aynı anda açıp kapatıyor.
                 size_hint: 0.25,0.333
                 pos_hint: {"x": 0, "y": 0.666}
                 on_release:
                     app.root.current = 'controlpage'
-            Button:
-                text:" "
-                size_hint: 0.25,0.333
+            Image:
+                id: status2
+                source: "cross.png"
+                size_hint: 0.1,0.1
                 pos_hint: {"x": 0, "y": 0.333}
-                on_release:
-                    app.root.current = 'controlpage'
             Button:
                 text:" "
                 size_hint: 0.25,0.333
@@ -92,22 +104,35 @@ ScreenManager:
                     app.root.current = 'controlpage'
             Button:
                 text:"ON/OFF"
+                id: onf
+                background_color: red
                 size_hint: 0.125,0.1665
                 pos_hint: {"x": 0.25, "y": 0.8325}
                 on_release:
-                    app.root.current = 'controlpage'
+                    if self.background_color == red: control.send("a")
+                    elif self.background_color == green: control.send("A")
+                    print("1.")
+
             Button:
                 text:"1,5A"
+                id: bir
+                background_color: red
                 size_hint: 0.125,0.1665
                 pos_hint: {"x": 0.375, "y": 0.8325}
                 on_release:
-                    app.root.current = 'controlpage'
+                    if self.background_color == red: control.send("b")
+                    elif self.background_color == green: control.send("B")
+                    print("2.")
             Button:
                 text:"3A"
+                id: iki
+                background_color: red
                 size_hint: 0.125,0.1665
                 pos_hint: {"x": 0.5, "y": 0.8325}
                 on_release:
-                    app.root.current = 'controlpage'
+                    if self.background_color == red: control.send("c")
+                    elif self.background_color == green: control.send("C")
+                    print("3.")
             Button:
                 text:"6A"
                 size_hint: 0.125,0.1665

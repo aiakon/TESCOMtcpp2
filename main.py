@@ -44,7 +44,7 @@ class MainPage(Screen):
         global s
         try:
             host = self.box.text
-            port = 10001
+            port = int(self.portt.text)
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.connect((host, port))
                 # Eğer sorunsuz bağlandıysa

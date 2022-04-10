@@ -10,6 +10,7 @@
 <Button>
     size_hint:0.26,0.1
     background_color: default
+    font_size:30
 
 ScreenManager:
     transition: NoTransition()
@@ -22,6 +23,7 @@ ScreenManager:
 
         # Mainpage IDs
         box: box
+        portt: portt
         status: status
         status2: status2
 
@@ -49,10 +51,17 @@ ScreenManager:
                 multiline: False
                 size_hint: 0.5,0.1
                 pos_hint: {"x": 0.265, "y": 0.8}
+            TextInput:
+                id: portt
+                font_size: 24
+                text: ""
+                multiline: False
+                size_hint: 0.5,0.1
+                pos_hint: {"x": 0.265, "y": 0.7}
             Button:
                 text:"Enter"
                 size_hint: 0.1,0.1
-                pos_hint: {"x": 0.785, "y": 0.8}
+                pos_hint: {"x": 0.785, "y": 0.75}
                 on_release:
                     # app.root.current = 'controlpage'
                     main.tcp()
@@ -61,7 +70,7 @@ ScreenManager:
                 id: status
                 source: "cross.png"
                 size_hint: 0.1,0.1
-                pos_hint: {"x": 0.885, "y": 0.8}
+                pos_hint: {"x": 0.885, "y": 0.75}
 
             Button:
                 text:"Offline"

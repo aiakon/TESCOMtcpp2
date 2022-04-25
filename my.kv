@@ -1,36 +1,546 @@
 #:import NoTransition kivy.uix.screenmanager.NoTransition
-#:set red [255, 0.5, 0.5, 1]
-#:set green [0.5, 255, 0.5, 1]
+#:import hex kivy.utils.get_color_from_hex
+#:set red [255, 0.5, 0.5, 0.95]
+#:set green [0.5, 255, 0.5, 0.95]
 #:set default [1, 1, 1, 0.95]
+
+
+# red: [255, 100/255, 100/255, .85], gray: [255/255, 255/255, 255/255, .95], green: [180/255, 255/255, 180/255, .95]
+
 
 <Label>
     size_hint: 0.1,0.1
-    font_size:17
+    font_size:20.5
     color: 0,0,0,1
+<LimitInput>
+    font_size:20.5
 <Button>
     size_hint:0.26,0.1
     background_color: default
-    font_size:30
 
 ScreenManager:
     transition: NoTransition()
     id: screen_manager
 
 
-    MainPage:
-        name: 'mainpage'
-        id: main
+#############################################################################
 
-        # Mainpage IDs
+    ControlPage:
+        name: 'controlpage'
+        id: control
+        screen_manager: screen_manager
+
+
+        # OptionPage IDs
         box: box
-        portt: portt
+        status: status
+
+        # Controlpage IDs
+        v: v
+        pf:pf
+        kva: kva
+        status2: status2
+
+        r_onof: r_onof      # R Phase Buttons
+        r_1: r_1
+        r_2: r_2
+        r_3: r_3
+        r_4: r_4
+        r_5: r_5
+        r_6: r_6
+        r_7: r_7
+        r_8: r_8
+        r_9: r_9
+        r_10: r_10
+        r_11: r_11
+
+        s_onof: s_onof      # S Phase Buttons
+        s_1: s_1
+        s_2: s_2
+        s_3: s_3
+        s_4: s_4
+        s_5: s_5
+        s_6: s_6
+        s_7: s_7
+        s_8: s_8
+        s_9: s_9
+        s_10: s_10
+        s_11: s_11
+
+        t_onof: t_onof      # T Phase Buttons
+        t_1: t_1
+        t_2: t_2
+        t_3: t_3
+        t_4: t_4
+        t_5: t_5
+        t_6: t_6
+        t_7: t_7
+        t_8: t_8
+        t_9: t_9
+        t_10: t_10
+        t_11: t_11
+        masteronof: masteronof
+        r_prc: r_prc
+        s_prc: s_prc
+        t_prc: t_prc
+
+        canvas.before:
+            Color:
+                rgba: (1, 1, 1, 1)
+            Rectangle:
+                pos:self.pos
+                size:self.size
+
+        FloatLayout:
+            Button:
+                id: masteronof
+                text:" Master\nON/OFF" # tüm on/off ları aynı anda açıp kapatıyor.
+                size_hint: 0.23,0.1549
+                background_color: red
+                pos_hint: {"x": 0.01, "y": 0.8276}
+                on_release:
+                    if self.background_color == red: control.send("{")
+                    elif self.background_color == green: control.send("}")
+
+
+            Button:
+                text:"RESET"
+                size_hint: 0.23,0.1549
+                background_color: red
+                pos_hint: {"x": 0.01, "y": 0.6727}
+                on_release:
+                    control.reset()
+
+            Label:
+                text: "Vout:"
+                pos_hint: {"x": 0, "y": 0.555}
+            LimitInput:
+                id: v
+                len: 0
+                on_text:
+                    self.readonly = True if len(self.text.strip()) == 3 else False
+                size_hint: 0.14,0.1032
+                pos_hint: {"x": 0.1, "y": 0.555}
+            Label:
+                text: "kVA/Faz:"
+                pos_hint: {"x": 0, "y": 0.4518}
+            LimitInput:
+                id: kva
+                on_text:
+                    self.readonly = True if len(self.text.strip()) == 3 else False
+                size_hint: 0.14,0.1032
+                pos_hint: {"x": 0.1, "y": 0.4518}
+            Label:
+                text: "PF:"
+                pos_hint: {"x": 0, "y": 0.355}
+            LimitInput:
+                id: pf
+                on_text:
+                    self.readonly = True if len(self.text.strip()) == 3 else False
+                size_hint: 0.14,0.1032
+                pos_hint: {"x": 0.1, "y": 0.355}
+
+            Label:
+                text: "%R Load"
+                text_size: self.size
+                halign: "left"
+                pos_hint: {"x": 0.027, "y": 0.295}
+            Label:
+                id: r_prc
+                text: "%-"
+                text_size: self.size
+                halign: "left"
+                pos_hint: {"x": 0.027, "y": 0.27}
+
+            Label:
+                text: "%S Load"
+                text_size: self.size
+                halign: "left"
+                pos_hint: {"x": 0.102, "y": 0.295}
+            Label:
+                id: s_prc
+                text: "%-"
+                text_size: self.size
+                halign: "left"
+                pos_hint: {"x": 0.102, "y": 0.27}
+
+            Label:
+                text: "%T Load"
+                text_size: self.size
+                halign: "left"
+                pos_hint: {"x": 0.177, "y": 0.295}
+            Label:
+                id: t_prc
+                text: "%-"
+                text_size: self.size
+                halign: "left"
+                pos_hint: {"x": 0.177, "y": 0.27}
+
+
+            Button:
+                text:"Enter"
+                size_hint: 0.23,0.1
+                pos_hint: {"x": 0.01, "y": 0.1177}
+                on_release:
+                    control.percentage_init()
+
+            Button:
+                text:"Ayarlar "
+                size_hint: 0.18,0.1
+                pos_hint: {"x": 0.01, "y": 0.0177}
+                on_release:
+                    control.thread_pause = True
+                    app.root.current = 'optionpage'
+
+            Image:
+                id: status2
+                source: "cross.png"
+                size_hint: 0.10,0.10
+                pos_hint: {"x": 0.165, "y": 0.0177}
+
+            Button:
+                text:"ON/OFF"
+                id: r_onof
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.25, "y": 0.8276}
+                on_release:
+                    if self.background_color == red: control.send("q")
+                    elif self.background_color == green: control.send("Q")
+
+            Button:
+                text:"1,5A"
+                id: r_1
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.3733, "y": 0.8276}
+                on_release:
+                    if self.background_color == red: control.send("w")
+                    elif self.background_color == green: control.send("W")
+
+            Button:
+                text:"3A"
+                id: r_2
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.4966, "y": 0.8276}
+                on_release:
+                    if self.background_color == red: control.send("e")
+                    elif self.background_color == green: control.send("E")
+            Button:
+                id: r_3
+                text:"6A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.6199, "y": 0.8276}
+                on_release:
+                    if self.background_color == red: control.send("r")
+                    elif self.background_color == green: control.send("R")
+            Button:
+                id: r_4
+                text:"9A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.7432, "y": 0.8276}
+                on_release:
+                    if self.background_color == red: control.send("t")
+                    elif self.background_color == green: control.send("T")
+            Button:
+                id: r_5
+                text:"12A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.8665, "y": 0.8276}
+                on_release:
+                    if self.background_color == red: control.send("y")
+                    elif self.background_color == green: control.send("Y")
+            Button:
+                id: r_6
+                text:"32A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.25, "y": 0.6727}
+                on_release:
+                    if self.background_color == red: control.send("u")
+                    elif self.background_color == green: control.send("U")
+            Button:
+                id: r_7
+                text:"4A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.3733, "y": 0.6727}
+                on_release:
+                    if self.background_color == red: control.send("o")
+                    elif self.background_color == green: control.send("O")
+            Button:
+                id: r_8
+                text:"8A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.4966, "y": 0.6727}
+                on_release:
+                    if self.background_color == red: control.send("p")
+                    elif self.background_color == green: control.send("P")
+            Button:
+                id: r_9
+                text:"15A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.6199, "y": 0.6727}
+                on_release:
+                    if self.background_color == red: control.send("a")
+                    elif self.background_color == green: control.send("A")
+            Button:
+                id: r_10
+                text:"22A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.7432, "y": 0.6727}
+                on_release:
+                    if self.background_color == red: control.send("s")
+                    elif self.background_color == green: control.send("S")
+            Button:
+                id: r_11
+                text:"42A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.8665, "y": 0.6727}
+                on_release:
+                    if self.background_color == red: control.send("d")
+                    elif self.background_color == green: control.send("D")
+
+
+            Button:
+                id: s_onof
+                text:"ON/OFF"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.25, "y": 0.5001}
+                on_release:
+                    if self.background_color == red: control.send("f")
+                    elif self.background_color == green: control.send("F")
+            Button:
+                id: s_1
+                text:"1,5A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.3733, "y": 0.5001}
+                on_release:
+                    if self.background_color == red: control.send("g")
+                    elif self.background_color == green: control.send("G")
+            Button:
+                id: s_2
+                text:"3A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.4966, "y": 0.5001}
+                on_release:
+                    if self.background_color == red: control.send("h")
+                    elif self.background_color == green: control.send("H")
+            Button:
+                id: s_3
+                text:"6A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.6199, "y": 0.5001}
+                on_release:
+                    if self.background_color == red: control.send("j")
+                    elif self.background_color == green: control.send("J")
+            Button:
+                id: s_4
+                text:"9A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.7432, "y": 0.5001}
+                on_release:
+                    if self.background_color == red: control.send("k")
+                    elif self.background_color == green: control.send("K")
+            Button:
+                id: s_5
+                text:"12A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.8665, "y": 0.5001}
+                on_release:
+                    if self.background_color == red: control.send("l")
+                    elif self.background_color == green: control.send("L")
+            Button:
+                id: s_6
+                text:"32A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.25, "y": 0.3452}
+                on_release:
+                    if self.background_color == red: control.send("i")
+                    elif self.background_color == green: control.send("I")
+            Button:
+                id: s_7
+                text:"4A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.3733, "y": 0.3452}
+                on_release:
+                    if self.background_color == red: control.send("z")
+                    elif self.background_color == green: control.send("Z")
+            Button:
+                id: s_8
+                text:"8A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.4966, "y": 0.3452}
+                on_release:
+                    if self.background_color == red: control.send("x")
+                    elif self.background_color == green: control.send("X")
+            Button:
+                id: s_9
+                text:"15A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.6199, "y": 0.3452}
+                on_release:
+                    if self.background_color == red: control.send("c")
+                    elif self.background_color == green: control.send("C")
+            Button:
+                id: s_10
+                text:"22A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.7432, "y": 0.3452}
+                on_release:
+                    if self.background_color == red: control.send("v")
+                    elif self.background_color == green: control.send("V")
+            Button:
+                id: s_11
+                text:"42A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.8665, "y": 0.3452}
+                on_release:
+                    if self.background_color == red: control.send("b")
+                    elif self.background_color == green: control.send("B")
+
+
+            Button:
+                id: t_onof
+                text:"ON/OFF"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.25, "y": 0.1726}
+                on_release:
+                    if self.background_color == red: control.send("n")
+                    elif self.background_color == green: control.send("N")
+            Button:
+                id: t_1
+                text:"1,5A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.3733, "y": 0.1726}
+                on_release:
+                    if self.background_color == red: control.send("m")
+                    elif self.background_color == green: control.send("M")
+            Button:
+                id: t_2
+                text:"3A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.4966, "y": 0.1726}
+                on_release:
+                    if self.background_color == red: control.send("1")
+                    elif self.background_color == green: control.send("!")
+            Button:
+                id: t_3
+                text:"6A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.6199, "y": 0.1726}
+                on_release:
+                    if self.background_color == red: control.send("2")
+                    elif self.background_color == green: control.send("'")
+            Button:
+                id: t_4
+                text:"9A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.7432, "y": 0.1726}
+                on_release:
+                    if self.background_color == red: control.send("3")
+                    elif self.background_color == green: control.send("^")
+            Button:
+                id: t_5
+                text:"12A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.8665, "y": 0.1726}
+                on_release:
+                    if self.background_color == red: control.send("4")
+                    elif self.background_color == green: control.send("+")
+            Button:
+                id: t_6
+                text:"32A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.25, "y": 0.0177}
+                on_release:
+                    if self.background_color == red: control.send("5")
+                    elif self.background_color == green: control.send("%")
+            Button:
+                id: t_7
+                text:"4A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.3733, "y": 0.0177}
+                on_release:
+                    if self.background_color == red: control.send("6")
+                    elif self.background_color == green: control.send("&")
+            Button:
+                id: t_8
+                text:"8A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.4966, "y": 0.0177}
+                on_release:
+                    if self.background_color == red: control.send("7")
+                    elif self.background_color == green: control.send("/")
+            Button:
+                id: t_9
+                text:"15A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.6199, "y": 0.0177}
+                on_release:
+                    if self.background_color == red: control.send("8")
+                    elif self.background_color == green: control.send("(")
+            Button:
+                id: t_10
+                text:"22A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.7432, "y": 0.0177}
+                on_release:
+                    if self.background_color == red: control.send("9")
+                    elif self.background_color == green: control.send(")")
+            Button:
+                id: t_11
+                text:"42A"
+                background_color: red
+                size_hint: 0.1233,0.1549
+                pos_hint: {"x": 0.8665, "y": 0.0177}
+                on_release:
+                    if self.background_color == red: control.send("0")
+                    elif self.background_color == green: control.send("=")
+
+#########################################################################
+
+
+    OptionPage:
+        name: 'optionpage'
+        id: option
+
+        # OptionPage IDs
+        box: box
         status: status
         status2: status2
 
-        # Controlpage IDs
-        onf: onf
-        bir: bir
-        iki: iki
 
         canvas.before:
             Color:
@@ -51,296 +561,22 @@ ScreenManager:
                 multiline: False
                 size_hint: 0.5,0.1
                 pos_hint: {"x": 0.265, "y": 0.8}
-            TextInput:
-                id: portt
-                font_size: 24
-                text: ""
-                multiline: False
-                size_hint: 0.5,0.1
-                pos_hint: {"x": 0.265, "y": 0.7}
             Button:
-                text:"Enter"
+                text:"Kaydet"
                 size_hint: 0.1,0.1
-                pos_hint: {"x": 0.785, "y": 0.75}
+                pos_hint: {"x": 0.785, "y": 0.8}
                 on_release:
-                    # app.root.current = 'controlpage'
-                    main.tcp()
+                    option.save()
 
             Image:
                 id: status
                 source: "cross.png"
                 size_hint: 0.1,0.1
-                pos_hint: {"x": 0.885, "y": 0.75}
+                pos_hint: {"x": 0.885, "y": 0.8}
 
             Button:
-                text:"Offline"
+                text:"Geri"
                 size_hint: 0.2,0.1
                 pos_hint: {"x": 0.385, "y": 0.4}
-                on_release:
-                    app.root.current = 'controlpage'
-
-#############################################################################
-
-    ControlPage:
-        name: 'controlpage'
-        id: control
-        status2: status2
-
-        canvas.before:
-            Color:
-                rgba: (1, 1, 1, 1)
-            Rectangle:
-                pos:self.pos
-                size:self.size
-
-        FloatLayout:
-            Button:
-                text:" Master\nON/OFF" # tüm on/off ları aynı anda açıp kapatıyor.
-                size_hint: 0.25,0.333
-                pos_hint: {"x": 0, "y": 0.666}
-                on_release:
-                    app.root.current = 'controlpage'
-            Image:
-                id: status2
-                source: "cross.png"
-                size_hint: 0.1,0.1
-                pos_hint: {"x": 0, "y": 0.333}
-            Button:
-                text:" "
-                size_hint: 0.25,0.333
-                pos_hint: {"x": 0, "y": 0}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"ON/OFF"
-                id: onf
-                background_color: red
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.25, "y": 0.8325}
-                on_release:
-                    if self.background_color == red: control.send("a")
-                    elif self.background_color == green: control.send("A")
-                    print("1.")
-
-            Button:
-                text:"1,5A"
-                id: bir
-                background_color: red
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.375, "y": 0.8325}
-                on_release:
-                    if self.background_color == red: control.send("b")
-                    elif self.background_color == green: control.send("B")
-                    print("2.")
-            Button:
-                text:"3A"
-                id: iki
-                background_color: red
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.5, "y": 0.8325}
-                on_release:
-                    if self.background_color == red: control.send("c")
-                    elif self.background_color == green: control.send("C")
-                    print("3.")
-            Button:
-                text:"6A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.625, "y": 0.8325}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"9A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.75, "y": 0.8325}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"12A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.875, "y": 0.8325}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"32A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.25, "y": 0.666}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"4A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.375, "y": 0.666}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"8A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.5, "y": 0.666}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"15A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.625, "y": 0.666}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"22A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.75, "y": 0.666}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"42A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.875, "y": 0.666}
-                on_release:
-                    app.root.current = 'controlpage'
-
-
-            Button:
-                text:"ON/OFF"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.25, "y": 0.4995}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"1,5A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.375, "y": 0.4995}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"3A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.5, "y": 0.4995}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"6A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.625, "y": 0.4995}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"9A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.75, "y": 0.4995}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"12A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.875, "y": 0.4995}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"32A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.25, "y": 0.333}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"4A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.375, "y": 0.333}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"8A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.5, "y": 0.333}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"15A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.625, "y": 0.333}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"22A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.75, "y": 0.333}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"42A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.875, "y": 0.333}
-                on_release:
-                    app.root.current = 'controlpage'
-
-
-            Button:
-                text:"ON/OFF"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.25, "y": 0.1665}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"1,5A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.375, "y": 0.1665}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"3A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.5, "y": 0.1665}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"6A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.625, "y": 0.1665}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"9A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.75, "y": 0.1665}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"12A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.875, "y": 0.1665}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"32A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.25, "y": 0}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"4A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.375, "y": 0}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"8A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.5, "y": 0}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"15A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.625, "y": 0}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"22A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.75, "y": 0}
-                on_release:
-                    app.root.current = 'controlpage'
-            Button:
-                text:"42A"
-                size_hint: 0.125,0.1665
-                pos_hint: {"x": 0.875, "y": 0}
                 on_release:
                     app.root.current = 'controlpage'

@@ -23,12 +23,11 @@ class LimitInput(TextInput):
     valid_characters = "0123456789.,"
 
     def insert_text(self, substring, from_undo=False):
-        if substring in self.valid_characters and self.filled:
+        if substring in self.valid_characters:
             s = ''.join(substring)
             return super().insert_text(s, from_undo=from_undo)
         else:
             pass
-
 
     def keyboard_on_key_up(self, keycode, text):
         if self.readonly and text[1] == "backspace":
@@ -467,7 +466,7 @@ class ControlPage(Screen):
 
     def tcp_thread(self):
         global s
-
+        print("test1\n")
         func = [self.r_onof, self.s_onof, self.t_onof,
                 self.r_1, self.r_2, self.r_3, self.r_4, self.r_5, self.r_6, self.r_7, self.r_8, self.r_9,
                 self.r_10, self.r_11,
@@ -493,11 +492,13 @@ class ControlPage(Screen):
         currents = [1.5, 3, 6, 9, 18, 32, 4, 8, 15, 22, 42]
 
         try:
+            print("test2")
             host = self.box.text  # Get IP from TextInput.
             port = 10001
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                print("test3")
                 s.connect((host, port))  # Try to connect
-
+                print("test4")
                 # If connected:
                 self.is_trying_to_connect = False
                 Clock.schedule_once(self.tick)  # Make Connection status ON (Green tick)
@@ -510,7 +511,9 @@ class ControlPage(Screen):
                 f.write(a)  # Save the file
                 f.close()
                 while True:
+                    print("test5")
                     data = s.recv(2)  # Receive data
+                    print("test6")
                     datastr = data.decode("utf-8")
                     print(datastr)
 
@@ -673,9 +676,10 @@ class ControlPage(Screen):
 
     def connection_check(self, dt):
         global s
-
+        print("test7")
         try:
             s.sendall(b'\x11')     # Sending a byte to check if connection is lost.
+            print("test8")
             self.is_connected = True     # Connection is on going.
             time.sleep(0.05)
 

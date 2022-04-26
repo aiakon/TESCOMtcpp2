@@ -150,10 +150,7 @@ class ControlPage(Screen):
     is_trying_to_connect = False
 
     def reset(self):
-        reset_chars = ["Q", "F", "N", "W", "E", "R", "T", "Y", "U", "O", "P", "A", "S", "D", "G", "H", "J", "K", "L",
-                       "I", "Z", "X", "C", "V", "B", "M", "!", "'", "^", "+", "%", "&", "/", "(", ")", "=", "}"]
-        for i in range(0, 37):
-            s.sendall(bytes(reset_chars[i], 'ascii'))
+        self.tcp_thread_start()
 
     def percentage_init(self):
 
@@ -435,14 +432,14 @@ class ControlPage(Screen):
     def on_enter(self, *args):
         if self.thread_pause is True and self.is_trying_to_connect is True:
             print("y")
-            Clock.schedule_once(self.tcp_thread_start, 0.01)  # Try to connect again.
+            #Clock.schedule_once(self.tcp_thread_start, 0.01)  # Try to connect again.
             self.is_trying_to_connect = False
             self.thread_pause = False
         if self.app_start_setup is True:     # Setting threads for once.
             self.app_start_setup = False
             Clock.schedule_once(self.getip, 0.01)  # At the start, get IP from txt file
-            Clock.schedule_once(self.tcp_thread_start, 0.01)  # Start tcp thread
-            Clock.schedule_interval(self.connection_check, 0.5)  # Check connection if its still on going.
+            #Clock.schedule_once(self.tcp_thread_start, 0.01)  # Start tcp thread
+            #Clock.schedule_interval(self.connection_check, 0.5)  # Check connection if its still on going.
 
     def getip(self, dt):
         # Edit spesific line
@@ -678,10 +675,14 @@ class ControlPage(Screen):
         global s
         print("test7")
         try:
-            s.sendall(b'\x11')     # Sending a byte to check if connection is lost.
-            print("test8")
-            self.is_connected = True     # Connection is on going.
-            time.sleep(0.05)
+            if self.is_connected:
+                s.sendall(b'\x11')     # Sending a byte to check if connection is lost.
+                print("test8")
+                self.is_connected = True     # Connection is on going.
+                time.sleep(0.05)
+            elif not self.is_connected:
+                print("passed check")
+                pass
 
         except:
             self.is_connected = False    # Connection is lost.

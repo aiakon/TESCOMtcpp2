@@ -1,0 +1,480 @@
+#:import NoTransition kivy.uix.screenmanager.NoTransition
+
+<Label>
+    size_hint: 0.1,0.1
+    font_size:17
+    color: 0,0,0,1
+<ProgressBar>
+    min:0
+    max:100
+<Button>
+    size_hint:0.26,0.1
+
+ScreenManager:
+    transition: NoTransition()
+    id: screen_manager
+
+
+    MainPage:
+        name: 'mainpage'
+        location_infotxt: location_info
+        canvas.before:
+            Color:
+                rgba: (1, 1, 1, 1)
+            Rectangle:
+                pos:self.pos
+                size:self.size
+
+        FloatLayout:
+            Label:
+                text: "URL:"
+                font_size: 19
+                pos_hint: {"x": 0.2, "y": 0.775}
+            TextInput:
+                id: http
+                text: ""
+                multiline: False
+                size_hint: 0.5,0.05
+                pos_hint: {"x": 0.3, "y": 0.8}
+            Button:
+                text:"Enter"
+                size_hint: 0.1,0.06
+                pos_hint: {"x": 0.82, "y": 0.795}
+                on_release:
+                    app.root.current = "exercisepage"
+
+            Button:
+                text:"Deneyler"
+                size_hint: 0.4,0.4
+                pos_hint: {"x": 0.05, "y": 0.2}
+                on_release:
+                    app.root.current = "exercisepage"
+            Button:
+                text:"Kamera"
+                size_hint: 0.4,0.4
+                pos_hint: {"x": 0.55, "y": 0.2}
+                on_release:
+                    app.root.current = "campage"
+
+
+
+    ExercisePage:
+        name: 'exercisepage'
+        id: excs
+        location_infotxt: location_info
+        canvas.before:
+            Color:
+                rgba: (1, 1, 1, 1)
+            Rectangle:
+                pos:self.pos
+                size:self.size
+
+        FloatLayout:
+            Button:
+                text:"Deney"
+                size_hint: 0.5,0.075
+                pos_hint: {"x": 0, "top": 0.075}
+                on_release:
+                    app.root.current = "exercisepage"
+
+            Button:
+                text:"Kamera"
+                size_hint: 0.5,0.075
+                pos_hint: {"x": 0.5, "top": 0.075}
+                on_release:
+                    app.root.current = "campage"
+
+            Label:
+                text:"DENEYLER"
+                font_size: 22
+                pos_hint: {"center_x": 0.5, "top": 0.9}
+
+            Button:
+                text:"Deney 1"
+                size_hint: 0.4,0.075
+                pos_hint: {"x": 0.3, "top": 0.65}
+                on_release:
+                    excs.deney1()
+                    app.root.current = "popup"
+
+            Button:
+                text:"Deney 2"
+                size_hint: 0.4,0.075
+                pos_hint: {"x": 0.3, "top": 0.54}
+                on_release:
+                    excs.deney2()
+                    app.root.current = "popup"
+
+            Button:
+                text:"Deney 3"
+                size_hint: 0.4,0.075
+                pos_hint: {"x": 0.3, "top": 0.43}
+
+
+    ExercisePopUp:
+        name: 'popup'
+        id: pop
+        location_infotxt: location_info
+        link: http.text
+        my_ico1: my_ico1
+        canvas.before:
+            Color:
+                rgba: (1, 1, 1, 1)
+            Rectangle:
+                pos:self.pos
+                size:self.size
+
+        FloatLayout:
+            Button:
+                text:"Elektropnömatik Kumanda Devresi"
+                size_hint: 0.35,0.075
+                pos_hint: {"x": 0.1, "top": 0.9}
+                on_release:
+                    app.root.current = "circuit"
+
+            Button:
+                text:"PLC Devresi"
+                size_hint: 0.35,0.075
+                pos_hint: {"x": 0.1, "top": 0.8}
+                on_release:
+                    app.root.current = "plc"
+
+            Button:
+                text:"Kamera"
+                size_hint: 0.35,0.075
+                pos_hint: {"x": 0.1, "top": 0.7}
+                on_release:
+                    app.root.current = "campage"
+
+            Button:
+                text:"Başlat"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0.175, "top": 0.5}
+                on_release:
+                    pop.deneme()
+
+            Button:
+                text:"Durdur"
+                size_hint: 0.1,0.075
+                pos_hint: {"x": 0.225, "top": 0.4}
+                on_release:
+                    pop.stopbutton()
+
+            Label:
+                text: "Piston 1"
+                pos_hint: {"x": 0.17, "top": 0.3}
+
+            Label:
+                text: "Piston 2"
+                pos_hint: {"x": 0.27, "top": 0.3}
+
+            Image:
+                id: my_ico1
+                source: pop.img_ico
+                size_hint_x: 0.04
+                allow_stretch: True
+                pos_hint: {"x": 0.2, "top": 0.7}
+
+            Image:
+                source: pop.img_ico
+                size_hint_x: 0.04
+                allow_stretch: True
+                pos_hint: {"x": 0.3, "top": 0.7}
+
+            TextInput:
+                id: location_info
+                text:""
+                size_hint: 0.4,0.825
+                pos_hint: {"x": 0.55, "top": 0.9}
+                disabled: True
+
+            Button:
+                text:"Geri"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0, "y": 0}
+                on_release:
+                    app.root.current = "exercisepage"
+
+            Button:
+                text:"test"
+                size_hint: 0.05,0.05
+                pos_hint: {"x": 0.12, "top": 0.22}
+                on_release:
+                    pop.testico()
+
+
+    CircuitPage:
+        name: 'circuit'
+        id: circ
+        my_image1: my_image1
+        canvas.before:
+            Color:
+                rgba: (1, 1, 1, 1)
+            Rectangle:
+                pos:self.pos
+                size:self.size
+
+        FloatLayout:
+            GridLayout:
+                cols: 1
+                pos_hint: {"top": .895, "left": 1}
+                size_hint: 1, .795
+                StencilView:
+                    id: stencil1
+                    Scatter:
+                        id: scatter
+                        pos: stencil1.pos
+                        size: my_image1.size
+                        Image:
+                            id: my_image1
+                            source: circ.img_src
+                            allow_stretch: True
+                            keep_ratio: True
+                            size: stencil1.width, stencil1.height
+
+            Button:
+                text:"Geri"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0, "y": 0}
+                on_release:
+                    app.root.current = "popup"
+            Button:
+                text:"Sonraki"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0.8, "y": 0}
+                on_release:
+                    circ.test()
+
+            Button:
+                text:"Önceki"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0.6, "y": 0}
+
+
+
+    CircuitPage2:
+        name: 'circuit2'
+        id: circ2
+        my_image2: my_image2
+        canvas.before:
+            Color:
+                rgba: (1, 1, 1, 1)
+            Rectangle:
+                pos:self.pos
+                size:self.size
+
+        FloatLayout:
+            GridLayout:
+                cols: 1
+                pos_hint: {"top": .895, "x": 0}
+                size_hint: 0.7, .795
+                StencilView:
+                    id: stencil2
+                    Scatter:
+                        id: scatter
+                        pos: stencil2.pos
+                        size: my_image2.size
+                        Image:
+                            id: my_image2
+                            source: circ2.img2_src
+                            allow_stretch: True
+                            keep_ratio: True
+                            size: stencil2.width, stencil2.height
+
+            TextInput:
+                text:"Bu bölüme dair açıklama."
+                pos_hint: {"top": .895, "x": 0.7}
+                size_hint: 0.3, .82
+
+            Button:
+                text:"Geri"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0, "y": 0}
+                on_release:
+                    app.root.current = "player"
+            Button:
+                text:"Sonraki"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0.8, "y": 0}
+                on_release:
+                    circ2.deneme()
+
+            Button:
+                text:"Önceki"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0.6, "y": 0}
+                on_release:
+                    circ2.minus()
+
+    PlcPage:
+        name: 'plc'
+        my_image3: my_image3
+        canvas.before:
+            Color:
+                rgba: (1, 1, 1, 1)
+            Rectangle:
+                pos:self.pos
+                size:self.size
+
+        FloatLayout:
+            GridLayout:
+                cols: 1
+                pos_hint: {"top": .895, "left": 1}
+                size_hint: 1, .795
+                StencilView:
+                    id: stencil3
+                    Scatter:
+                        id: scatter
+                        pos: stencil3.pos
+                        size: my_image3.size
+                        Image:
+                            id: my_image3
+                            source: './img/PLC.png'
+                            allow_stretch: True
+                            keep_ratio: True
+                            size: stencil3.width, stencil3.height
+
+            Button:
+                text:"Geri"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0, "y": 0}
+                on_release:
+                    app.root.current = "popup"
+            Button:
+                text:"Sonraki"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0.8, "y": 0}
+
+            Button:
+                text:"Önceki"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0.6, "y": 0}
+
+
+    Player:
+        name: 'player'
+        canvas.before:
+            Color:
+                rgba: (1, 1, 1, 1)
+            Rectangle:
+                pos:self.pos
+                size:self.size
+
+        FloatLayout:
+            GridLayout:
+                cols: 1
+                pos_hint: {"top": .895, "left": 1}
+                size_hint: 1, .795
+                StencilView:
+                    id: stencil4
+                    Scatter:
+                        id: scatter
+                        pos: stencil4.pos
+                        size: my_video1.size
+                        VideoPlayer:
+                            id: my_video1
+                            source: "./img/vid1.mp4"
+                            size: stencil4.width, stencil4.height
+
+            Button:
+                text:"Geri"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0, "y": 0}
+                on_release:
+                    app.root.current = "popup"
+            Button:
+                text:"Sonraki"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0.8, "y": 0}
+                on_release:
+                    app.root.current = "circuit2"
+
+            Button:
+                text:"Önceki"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0.6, "y": 0}
+                on_release:
+                    app.root.current = "circuit"
+
+    Player2:
+        name: 'player2'
+        canvas.before:
+            Color:
+                rgba: (1, 1, 1, 1)
+            Rectangle:
+                pos:self.pos
+                size:self.size
+
+        FloatLayout:
+            GridLayout:
+                cols: 1
+                pos_hint: {"top": .895, "left": 1}
+                size_hint: 1, .795
+                StencilView:
+                    id: stencil5
+                    Scatter:
+                        id: scatter
+                        pos: stencil5.pos
+                        size: my_video2.size
+                        VideoPlayer:
+                            id: my_video2
+                            source: "./img/vid2.mp4"
+                            size: stencil5.width, stencil5.height
+
+            Button:
+                text:"Geri"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0, "y": 0}
+                on_release:
+                    app.root.current = "popup"
+            Button:
+                text:"Sonraki"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0.8, "y": 0}
+                on_release:
+                    app.root.current = "circuit2"
+
+            Button:
+                text:"Önceki"
+                size_hint: 0.2,0.075
+                pos_hint: {"x": 0.6, "y": 0}
+                on_release:
+                    app.root.current = "circuit"
+
+    CamPage:
+        name: 'campage'
+        id: cam
+        link: http.text
+        canvas.before:
+            Color:
+                rgba: (1, 1, 1, 1)
+            Rectangle:
+                pos:self.pos
+                size:self.size
+        FloatLayout:
+
+            Label:
+                text: " "
+                font_size: 19
+                pos_hint: {"x": 0.2, "top": 0.725}
+            Button:
+                text:"Geri"
+                size_hint: 0.333,0.075
+                pos_hint: {"x": 0, "top": 0.075}
+                on_release:
+                    app.root.current = "popup"
+            Button:
+                text:"Deney"
+                size_hint: 0.333,0.075
+                pos_hint: {"x": 0.333, "top": 0.075}
+                on_release:
+                    app.root.current = "exercisepage"
+            Button:
+                text:"Kamera"
+                size_hint: 0.333,0.075
+                pos_hint: {"x": 0.666, "top": 0.075}
+                on_release:
+                    app.root.current = "campage"
+
+
+

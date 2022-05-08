@@ -104,12 +104,19 @@ ScreenManager:
 
 
             Button:
-                text:"RESET"
-                size_hint: 0.23,0.1549
+                text:"All ON"
+                size_hint: 0.115,0.1549
                 background_color: red
                 pos_hint: {"x": 0.01, "y": 0.6727}
                 on_release:
-                    control.reset()
+                    control.send(".")
+            Button:
+                text:"RESET"
+                size_hint: 0.115,0.1549
+                background_color: red
+                pos_hint: {"x": 0.125, "y": 0.6727}
+                on_release:
+                    control.send(",")
 
             Label:
                 text: "Vout:"
@@ -119,6 +126,7 @@ ScreenManager:
                 len: 0
                 on_text:
                     self.readonly = True if len(self.text.strip()) == 3 else False
+                on_text_validate: control.send("q")
                 size_hint: 0.14,0.1032
                 pos_hint: {"x": 0.1, "y": 0.555}
             Label:

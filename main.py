@@ -4,7 +4,7 @@
 
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
-from kivy.clock import Clock
+from kivy.clock import Clock, mainthread
 import time
 import threading
 import socket
@@ -12,6 +12,7 @@ from math import sqrt
 from kivy.core.window import Window
 from kivy.uix.textinput import TextInput
 from kivy.properties import BooleanProperty
+from kivy.clock import mainthread
 
 green = [0.5, 255, 0.5, 0.95]
 red = [255, 0.5, 0.5, 0.95]
@@ -22,14 +23,16 @@ is_connected = False  # Check if it's connected.
 class LimitInput(TextInput):
     valid_characters = "0123456789.,"
 
-    def insert_text(self, substring, from_undo=False):
+    def insert_text(self, substring, from_undo=False):      # Operates to write only Valid_Characters.
         if substring in self.valid_characters:
             s = ''.join(substring)
             return super().insert_text(s, from_undo=from_undo)
         else:
             pass
 
-    def keyboard_on_key_up(self, keycode, text):
+    def keyboard_on_key_up(self, keycode, text):    # Allows to only press backspace when character limit is reached.
+        if text[1] == 'enter':
+            Clock.schedule_once(ControlPage.percentage_init)
         if self.readonly and text[1] == "backspace":
             self.readonly = False
             self.do_backspace()
@@ -130,15 +133,13 @@ class Calc:
 
 
 class ControlPage(Screen):
-    r_loads = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    r_loads = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]     # Temporary Status of buttons
     s_loads = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     t_loads = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-    r_calc_loads = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    r_calc_loads = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]    # Final Status of buttons
     s_calc_loads = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     t_calc_loads = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
-    prc_calculation = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     total_r_prc = 0
     total_s_prc = 0
@@ -146,16 +147,21 @@ class ControlPage(Screen):
 
     thread_pause = BooleanProperty(False)
     is_connected = False  # Check if it's connected.
-    app_start_setup = True  # Setting threads for once.
+    is_setup_done = False  # Setup condition
     is_trying_to_connect = False
 
-    def reset(self):
-        reset_chars = ["Q", "F", "N", "W", "E", "R", "T", "Y", "U", "O", "P", "A", "S", "D", "G", "H", "J", "K", "L",
-                       "I", "Z", "X", "C", "V", "B", "M", "!", "'", "^", "+", "%", "&", "/", "(", ")", "=", "}"]
-        for i in range(0, 37):
-            s.sendall(bytes(reset_chars[i], 'ascii'))
+    def reset(self):    # Sends all disable chars to ESP32 to reset all button's status.
+        try:
+            reset_chars = ["Q", "F", "N", "W", "E", "R", "T", "Y", "U", "O", "P", "A",
+                           "S", "D", "G", "H", "J", "K", "L", "I", "Z", "X", "C", "V",
+                           "B", "M", "!", "'", "^", "+", "%", "&", "/", "(", ")", "=", "}"]
 
-    def percentage_init(self):
+            for i in range(0, 37):
+                s.sendall(bytes(reset_chars[i], 'ascii'))
+        except Exception as e:
+            print("sending reset crash,", e)
+
+    def percentage_init(self, *args):
 
         try:
             if float(self.pf.text.replace(',', '.')) == 0:
@@ -267,163 +273,118 @@ class ControlPage(Screen):
 
     def calculation(self, loads, phase):
         try:
+            prc_calculation = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # Stores
+
             if phase == "r":
                 if loads != [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]:
                     if self.v.text != '' and self.kva.text != '' and self.pf.text != '':
-                        self.prc_calculation = Calc.percentage(float(self.v.text), float(self.kva.text),
-                                                               float(self.pf.text.replace(',', '.')), loads)
+                        prc_calculation = Calc.percentage(float(self.v.text), float(self.kva.text),
+                                                          float(self.pf.text.replace(',', '.')), loads)
                 elif loads == [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]:
-                    self.prc_calculation = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                    prc_calculation = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 total_r_prc = 0
                 for k in range(5, 16):
-                    total_r_prc = total_r_prc + self.prc_calculation[k]
-                if self.prc_calculation[4] > self.prc_calculation[3]:
-                    self.r_1.text = f" 1,5A\n%{self.prc_calculation[5]}" if self.prc_calculation[
-                                                                                5] != 0 else "1,5A"
-                    self.r_2.text = f" 3A\n%{self.prc_calculation[6]}" if self.prc_calculation[
-                                                                              6] != 0 else "3A"
-                    self.r_3.text = f" 6A\n%{self.prc_calculation[7]}" if self.prc_calculation[
-                                                                              7] != 0 else "6A"
-                    self.r_4.text = f" 9A\n%{self.prc_calculation[8]}" if self.prc_calculation[
-                                                                              8] != 0 else "9A"
-                    self.r_5.text = f" 18A\n%{self.prc_calculation[9]}" if self.prc_calculation[
-                                                                               9] != 0 else "18A"
-                    self.r_6.text = f" 32A\n%{self.prc_calculation[10]}" if self.prc_calculation[
-                                                                                10] != 0 else "32A"
-                    self.r_7.text = f" 4A\n%{self.prc_calculation[11]}" if self.prc_calculation[
-                                                                               11] != 0 else "4A"
-                    self.r_8.text = f" 8A\n%{self.prc_calculation[12]}" if self.prc_calculation[
-                                                                               12] != 0 else "8A"
-                    self.r_9.text = f" 15A\n%{self.prc_calculation[13]}" if self.prc_calculation[
-                                                                                13] != 0 else "15A"
-                    self.r_10.text = f" 22A\n%{self.prc_calculation[14]}" if self.prc_calculation[
-                                                                                 14] != 0 else "22A"
-                    self.r_11.text = f" 42A\n%{self.prc_calculation[15]}" if self.prc_calculation[
-                                                                                 15] != 0 else "42A"
-                elif self.prc_calculation[3] >= self.prc_calculation[4]:
+                    total_r_prc = total_r_prc + prc_calculation[k]
+                if prc_calculation[4] > prc_calculation[3]:
+                    self.r_1.text = f" 1,5A\n%{prc_calculation[5]}" if prc_calculation[5] != 0 else "1,5A"
+                    self.r_2.text = f" 3A\n%{prc_calculation[6]}" if prc_calculation[6] != 0 else "3A"
+                    self.r_3.text = f" 6A\n%{prc_calculation[7]}" if prc_calculation[7] != 0 else "6A"
+                    self.r_4.text = f" 9A\n%{prc_calculation[8]}" if prc_calculation[8] != 0 else "9A"
+                    self.r_5.text = f" 18A\n%{prc_calculation[9]}" if prc_calculation[9] != 0 else "18A"
+                    self.r_6.text = f" 32A\n%{prc_calculation[10]}" if prc_calculation[10] != 0 else "32A"
+                    self.r_7.text = f" 4A\n%{prc_calculation[11]}" if prc_calculation[11] != 0 else "4A"
+                    self.r_8.text = f" 8A\n%{prc_calculation[12]}" if prc_calculation[12] != 0 else "8A"
+                    self.r_9.text = f" 15A\n%{prc_calculation[13]}" if prc_calculation[13] != 0 else "15A"
+                    self.r_10.text = f" 22A\n%{prc_calculation[14]}" if prc_calculation[14] != 0 else "22A"
+                    self.r_11.text = f" 42A\n%{prc_calculation[15]}" if prc_calculation[15] != 0 else "42A"
+                elif prc_calculation[3] >= prc_calculation[4]:
                     self.percentage_init()
-                    self.r_1.text = self.r_1.text if self.prc_calculation[11] == 0 else "1,5A"
-                    self.r_2.text = self.r_2.text if self.prc_calculation[12] == 0 else "3A"
-                    self.r_3.text = self.r_3.text if self.prc_calculation[13] == 0 else "6A"
-                    self.r_4.text = self.r_4.text if self.prc_calculation[14] == 0 else "9A"
-                    self.r_5.text = self.r_5.text if self.prc_calculation[15] == 0 else "18A"
+                    self.r_1.text = self.r_1.text if prc_calculation[11] == 0 else "1,5A"
+                    self.r_2.text = self.r_2.text if prc_calculation[12] == 0 else "3A"
+                    self.r_3.text = self.r_3.text if prc_calculation[13] == 0 else "6A"
+                    self.r_4.text = self.r_4.text if prc_calculation[14] == 0 else "9A"
+                    self.r_5.text = self.r_5.text if prc_calculation[15] == 0 else "18A"
 
-                    self.r_7.text = self.r_7.text if self.prc_calculation[
+                    self.r_7.text = self.r_7.text if prc_calculation[
                                                          11] != 0 else "4A"
-                    self.r_8.text = f" 8A\n%{self.prc_calculation[12]}" if self.prc_calculation[
-                                                                               12] != 0 else "8A"
-                    self.r_9.text = f" 15A\n%{self.prc_calculation[13]}" if self.prc_calculation[
-                                                                                13] != 0 else "15A"
-                    self.r_10.text = f" 22A\n%{self.prc_calculation[14]}" if self.prc_calculation[
-                                                                                 14] != 0 else "22A"
-                    self.r_11.text = f" 42A\n%{self.prc_calculation[15]}" if self.prc_calculation[
-                                                                                 15] != 0 else "42A"
+                    self.r_8.text = f" 8A\n%{prc_calculation[12]}" if prc_calculation[12] != 0 else "8A"
+                    self.r_9.text = f" 15A\n%{prc_calculation[13]}" if prc_calculation[13] != 0 else "15A"
+                    self.r_10.text = f" 22A\n%{prc_calculation[14]}" if prc_calculation[14] != 0 else "22A"
+                    self.r_11.text = f" 42A\n%{prc_calculation[15]}" if prc_calculation[ 15] != 0 else "42A"
                 self.r_prc.text = f"%{round(total_r_prc, 2)}"
 
             elif phase == "s":
                 if loads != [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]:
                     if self.v.text != '' and self.kva.text != '' and self.pf.text != '':
-                        self.prc_calculation = Calc.percentage(float(self.v.text), float(self.kva.text),
-                                                               float(self.pf.text.replace(',', '.')), loads)
+                        prc_calculation = Calc.percentage(float(self.v.text), float(self.kva.text),
+                                                          float(self.pf.text.replace(',', '.')), loads)
                 elif loads == [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]:
-                    self.prc_calculation = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                    prc_calculation = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 total_s_prc = 0
                 for k in range(5, 16):
-                    total_s_prc = total_s_prc + self.prc_calculation[k]
-                if self.prc_calculation[4] > self.prc_calculation[3]:
-                    self.s_1.text = f" 1,5A\n%{self.prc_calculation[5]}" if self.prc_calculation[
-                                                                                5] != 0 else "1,5A"
-                    self.s_2.text = f" 3A\n%{self.prc_calculation[6]}" if self.prc_calculation[
-                                                                              6] != 0 else "3A"
-                    self.s_3.text = f" 6A\n%{self.prc_calculation[7]}" if self.prc_calculation[
-                                                                              7] != 0 else "6A"
-                    self.s_4.text = f" 9A\n%{self.prc_calculation[8]}" if self.prc_calculation[
-                                                                              8] != 0 else "9A"
-                    self.s_5.text = f" 18A\n%{self.prc_calculation[9]}" if self.prc_calculation[
-                                                                               9] != 0 else "18A"
-                    self.s_6.text = f" 32A\n%{self.prc_calculation[10]}" if self.prc_calculation[
-                                                                                10] != 0 else "32A"
-                    self.s_7.text = f" 4A\n%{self.prc_calculation[11]}" if self.prc_calculation[
-                                                                               11] != 0 else "4A"
-                    self.s_8.text = f" 8A\n%{self.prc_calculation[12]}" if self.prc_calculation[
-                                                                               12] != 0 else "8A"
-                    self.s_9.text = f" 15A\n%{self.prc_calculation[13]}" if self.prc_calculation[
-                                                                                13] != 0 else "15A"
-                    self.s_10.text = f" 22A\n%{self.prc_calculation[14]}" if self.prc_calculation[
-                                                                                 14] != 0 else "22A"
-                    self.s_11.text = f" 42A\n%{self.prc_calculation[15]}" if self.prc_calculation[
-                                                                                 15] != 0 else "42A"
-                elif self.prc_calculation[3] >= self.prc_calculation[4]:
+                    total_s_prc = total_s_prc + prc_calculation[k]
+                if prc_calculation[4] > prc_calculation[3]:
+                    self.s_1.text = f" 1,5A\n%{prc_calculation[5]}" if prc_calculation[5] != 0 else "1,5A"
+                    self.s_2.text = f" 3A\n%{prc_calculation[6]}" if prc_calculation[6] != 0 else "3A"
+                    self.s_3.text = f" 6A\n%{prc_calculation[7]}" if prc_calculation[7] != 0 else "6A"
+                    self.s_4.text = f" 9A\n%{prc_calculation[8]}" if prc_calculation[8] != 0 else "9A"
+                    self.s_5.text = f" 18A\n%{prc_calculation[9]}" if prc_calculation[9] != 0 else "18A"
+                    self.s_6.text = f" 32A\n%{prc_calculation[10]}" if prc_calculation[10] != 0 else "32A"
+                    self.s_7.text = f" 4A\n%{prc_calculation[11]}" if prc_calculation[11] != 0 else "4A"
+                    self.s_8.text = f" 8A\n%{prc_calculation[12]}" if prc_calculation[12] != 0 else "8A"
+                    self.s_9.text = f" 15A\n%{prc_calculation[13]}" if prc_calculation[13] != 0 else "15A"
+                    self.s_10.text = f" 22A\n%{prc_calculation[14]}" if prc_calculation[14] != 0 else "22A"
+                    self.s_11.text = f" 42A\n%{prc_calculation[15]}" if prc_calculation[15] != 0 else "42A"
+                elif prc_calculation[3] >= prc_calculation[4]:
                     self.percentage_init()
-                    self.s_1.text = self.s_1.text if self.prc_calculation[11] == 0 else "1,5A"
-                    self.s_2.text = self.s_2.text if self.prc_calculation[12] == 0 else "3A"
-                    self.s_3.text = self.s_3.text if self.prc_calculation[13] == 0 else "6A"
-                    self.s_4.text = self.s_4.text if self.prc_calculation[14] == 0 else "9A"
-                    self.s_5.text = self.s_5.text if self.prc_calculation[15] == 0 else "18A"
+                    self.s_1.text = self.s_1.text if prc_calculation[11] == 0 else "1,5A"
+                    self.s_2.text = self.s_2.text if prc_calculation[12] == 0 else "3A"
+                    self.s_3.text = self.s_3.text if prc_calculation[13] == 0 else "6A"
+                    self.s_4.text = self.s_4.text if prc_calculation[14] == 0 else "9A"
+                    self.s_5.text = self.s_5.text if prc_calculation[15] == 0 else "18A"
 
-                    self.s_7.text = f" 4A\n%{self.prc_calculation[11]}" if self.prc_calculation[
-                                                                               11] != 0 else "4A"
-                    self.s_8.text = f" 8A\n%{self.prc_calculation[12]}" if self.prc_calculation[
-                                                                               12] != 0 else "8A"
-                    self.s_9.text = f" 15A\n%{self.prc_calculation[13]}" if self.prc_calculation[
-                                                                                13] != 0 else "15A"
-                    self.s_10.text = f" 22A\n%{self.prc_calculation[14]}" if self.prc_calculation[
-                                                                                 14] != 0 else "22A"
-                    self.s_11.text = f" 42A\n%{self.prc_calculation[15]}" if self.prc_calculation[
-                                                                                 15] != 0 else "42A"
+                    self.s_7.text = f" 4A\n%{prc_calculation[11]}" if prc_calculation[11] != 0 else "4A"
+                    self.s_8.text = f" 8A\n%{prc_calculation[12]}" if prc_calculation[12] != 0 else "8A"
+                    self.s_9.text = f" 15A\n%{prc_calculation[13]}" if prc_calculation[13] != 0 else "15A"
+                    self.s_10.text = f" 22A\n%{prc_calculation[14]}" if prc_calculation[14] != 0 else "22A"
+                    self.s_11.text = f" 42A\n%{prc_calculation[15]}" if prc_calculation[15] != 0 else "42A"
                 self.s_prc.text = f"%{round(total_s_prc, 2)}"
 
             elif phase == "t":
                 if loads != [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]:
                     if self.v.text != '' and self.kva.text != '' and self.pf.text != '':
-                        self.prc_calculation = Calc.percentage(float(self.v.text), float(self.kva.text),
-                                                               float(self.pf.text.replace(',', '.')), loads)
+                        prc_calculation = Calc.percentage(float(self.v.text), float(self.kva.text),
+                                                          float(self.pf.text.replace(',', '.')), loads)
                 elif loads == [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]:
-                    self.prc_calculation = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                    prc_calculation = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 total_t_prc = 0
                 for k in range(5, 16):
-                    total_t_prc = total_t_prc + self.prc_calculation[k]
-                if self.prc_calculation[4] > self.prc_calculation[3]:
-                    self.t_1.text = f" 1,5A\n%{self.prc_calculation[5]}" if self.prc_calculation[
-                                                                                5] != 0 else "1,5A"
-                    self.t_2.text = f" 3A\n%{self.prc_calculation[6]}" if self.prc_calculation[
-                                                                              6] != 0 else "3A"
-                    self.t_3.text = f" 6A\n%{self.prc_calculation[7]}" if self.prc_calculation[
-                                                                              7] != 0 else "6A"
-                    self.t_4.text = f" 9A\n%{self.prc_calculation[8]}" if self.prc_calculation[
-                                                                              8] != 0 else "9A"
-                    self.t_5.text = f" 18A\n%{self.prc_calculation[9]}" if self.prc_calculation[
-                                                                               9] != 0 else "18A"
-                    self.t_6.text = f" 32A\n%{self.prc_calculation[10]}" if self.prc_calculation[
-                                                                                10] != 0 else "32A"
-                    self.t_7.text = f" 4A\n%{self.prc_calculation[11]}" if self.prc_calculation[
-                                                                               11] != 0 else "4A"
-                    self.t_8.text = f" 8A\n%{self.prc_calculation[12]}" if self.prc_calculation[
-                                                                               12] != 0 else "8A"
-                    self.t_9.text = f" 15A\n%{self.prc_calculation[13]}" if self.prc_calculation[
-                                                                                13] != 0 else "15A"
-                    self.t_10.text = f" 22A\n%{self.prc_calculation[14]}" if self.prc_calculation[
-                                                                                 14] != 0 else "22A"
-                    self.t_11.text = f" 42A\n%{self.prc_calculation[15]}" if self.prc_calculation[
-                                                                                 15] != 0 else "42A"
-                elif self.prc_calculation[3] >= self.prc_calculation[4]:
+                    total_t_prc = total_t_prc + prc_calculation[k]
+                if prc_calculation[4] > prc_calculation[3]:
+                    self.t_1.text = f" 1,5A\n%{prc_calculation[5]}" if prc_calculation[5] != 0 else "1,5A"
+                    self.t_2.text = f" 3A\n%{prc_calculation[6]}" if prc_calculation[6] != 0 else "3A"
+                    self.t_3.text = f" 6A\n%{prc_calculation[7]}" if prc_calculation[7] != 0 else "6A"
+                    self.t_4.text = f" 9A\n%{prc_calculation[8]}" if prc_calculation[8] != 0 else "9A"
+                    self.t_5.text = f" 18A\n%{prc_calculation[9]}" if prc_calculation[9] != 0 else "18A"
+                    self.t_6.text = f" 32A\n%{prc_calculation[10]}" if prc_calculation[10] != 0 else "32A"
+                    self.t_7.text = f" 4A\n%{prc_calculation[11]}" if prc_calculation[11] != 0 else "4A"
+                    self.t_8.text = f" 8A\n%{prc_calculation[12]}" if prc_calculation[12] != 0 else "8A"
+                    self.t_9.text = f" 15A\n%{prc_calculation[13]}" if prc_calculation[13] != 0 else "15A"
+                    self.t_10.text = f" 22A\n%{prc_calculation[14]}" if prc_calculation[14] != 0 else "22A"
+                    self.t_11.text = f" 42A\n%{prc_calculation[15]}" if prc_calculation[15] != 0 else "42A"
+                elif prc_calculation[3] >= prc_calculation[4]:
                     self.percentage_init()
-                    self.t_1.text = self.t_1.text if self.prc_calculation[11] == 0 else "1,5A"
-                    self.t_2.text = self.t_2.text if self.prc_calculation[12] == 0 else "3A"
-                    self.t_3.text = self.t_3.text if self.prc_calculation[13] == 0 else "6A"
-                    self.t_4.text = self.t_4.text if self.prc_calculation[14] == 0 else "9A"
-                    self.t_5.text = self.t_5.text if self.prc_calculation[15] == 0 else "18A"
+                    self.t_1.text = self.t_1.text if prc_calculation[11] == 0 else "1,5A"
+                    self.t_2.text = self.t_2.text if prc_calculation[12] == 0 else "3A"
+                    self.t_3.text = self.t_3.text if prc_calculation[13] == 0 else "6A"
+                    self.t_4.text = self.t_4.text if prc_calculation[14] == 0 else "9A"
+                    self.t_5.text = self.t_5.text if prc_calculation[15] == 0 else "18A"
 
-                    self.t_7.text = f" 4A\n%{self.prc_calculation[11]}" if self.prc_calculation[
-                                                                               11] != 0 else "4A"
-                    self.t_8.text = f" 8A\n%{self.prc_calculation[12]}" if self.prc_calculation[
-                                                                               12] != 0 else "8A"
-                    self.t_9.text = f" 15A\n%{self.prc_calculation[13]}" if self.prc_calculation[
-                                                                                13] != 0 else "15A"
-                    self.t_10.text = f" 22A\n%{self.prc_calculation[14]}" if self.prc_calculation[
-                                                                                 14] != 0 else "22A"
-                    self.t_11.text = f" 42A\n%{self.prc_calculation[15]}" if self.prc_calculation[
-                                                                                 15] != 0 else "42A"
+                    self.t_7.text = f" 4A\n%{prc_calculation[11]}" if prc_calculation[11] != 0 else "4A"
+                    self.t_8.text = f" 8A\n%{prc_calculation[12]}" if prc_calculation[12] != 0 else "8A"
+                    self.t_9.text = f" 15A\n%{prc_calculation[13]}" if prc_calculation[13] != 0 else "15A"
+                    self.t_10.text = f" 22A\n%{prc_calculation[14]}" if prc_calculation[14] != 0 else "22A"
+                    self.t_11.text = f" 42A\n%{prc_calculation[15]}" if prc_calculation[15] != 0 else "42A"
                 self.t_prc.text = f"%{round(total_t_prc, 2)}"
         except ValueError as e:
             self.v.text = ''
@@ -433,22 +394,20 @@ class ControlPage(Screen):
             pass
 
     def on_enter(self, *args):
-
-        a = TcpThread()
-        a.tcp_thread_start()
-        '''if self.thread_pause is True and self.is_trying_to_connect is True:
+        if self.thread_pause is True and self.is_trying_to_connect is True:
             print("y")
             Clock.schedule_once(self.tcp_thread_start, 0.01)  # Try to connect again.
             self.is_trying_to_connect = False
             self.thread_pause = False
 
-        if self.app_start_setup is True:  # Setting threads for once.
-            self.app_start_setup = False
+        if self.is_setup_done is False:  # Setting threads for once.
+            self.is_setup_done = True
             Clock.schedule_once(self.getip, 0.01)  # At the start, get IP from txt file
             Clock.schedule_once(self.tcp_thread_start, 0.01)  # Start tcp thread
-            Clock.schedule_interval(self.connection_check, 0.5)  # Check connection if its still on going.'''
+            Clock.schedule_interval(self.connection_check, 0.5)  # Check connection if its still on going.
 
-    def getip(self, dt):
+    @mainthread
+    def getip(self, *args):
         # Edit spesific line
         a = open("ip.txt", "r").read().split('\n')  # Read .txt file
         self.v.text = a[1]
@@ -456,18 +415,20 @@ class ControlPage(Screen):
         self.pf.text = a[3]
         self.box.text = open("ip.txt", "r").read().split('\n')[0]
 
-    def tick(self, dt):
+    @mainthread
+    def tick(self, *args):
         self.status.source = "tick.png"
         self.status2.source = "tick.png"
 
-    def cross(self, dt):
+    @mainthread
+    def cross(self, *args):
         self.status.source = "cross.png"
         self.status2.source = "cross.png"
 
     def tcp_thread_start(self, *args):
         y = threading.Thread(target=self.tcp_thread, daemon=True)  # Setup thread
         y.start()  # Starts thread
-        print("testthreadstart")
+        print("testthreadstart", threading.enumerate())
 
     def tcp_thread(self):
         global s
@@ -500,6 +461,7 @@ class ControlPage(Screen):
             host = self.box.text  # Get IP from TextInput.
             port = 10001
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                # s.settimeout(0.01)
                 s.connect((host, port))  # Try to connect
 
                 # If connected:
@@ -519,6 +481,7 @@ class ControlPage(Screen):
                     print(datastr)
 
                     a = []
+                    print(threading.enumerate())
                     for x in range(3, 36):  # Button states
                         a.append(func[x].background_color)
 
@@ -651,7 +614,9 @@ class ControlPage(Screen):
             Clock.schedule_once(self.cross)  # Make Connection status OFF (Red cross)
             print("crash", e)
 
+    @mainthread
     def test(self):
+        print(self.v.text)
         print("test Kivy Func inside TCP func")
 
     def send(self, x):
@@ -716,17 +681,27 @@ class TcpThread(ControlPage):
         print("testthreadstart")
 
     def tcp(self):
-        print("testtcptctt")
-        host = "192.168.1.10"  # Get IP from TextInput.
-        port = 10001
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((host, port))  # Try to connect
+        try:
+            print("testtcptctt")
+            host = "192.168.43.99"  # Get IP from TextInput.
+            port = 10001
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect((host, port))  # Try to connect
 
-            while True:
-                data = s.recv(2)  # Receive data
-                datastr = data.decode("utf-8")
-                print(datastr)
-                Clock.schedule_once(ControlPage.test, 0.01)
+                while True:
+                    data = s.recv(2)  # Receive data
+                    datastr = data.decode("utf-8")
+                    print(datastr)
+                    if datastr == '':
+                        break
+                    Clock.schedule_once(ControlPage.test, 0.01)
+                    print(threading.enumerate())
+
+
+            self.tcp_thread_start()
+        except Exception as e:
+            print("crash yedik,", e)
+            self.tcp_thread_start()
 
     pass
 

@@ -1,0 +1,417 @@
+<GeneralcontrolPage@Screen>:
+    name: 'generalcontrolpage'
+    id: generalcontrol
+
+
+
+    # OptionPage IDs
+
+
+    # controlpage IDs
+    v: v
+    pf:pf
+    kva: kva
+
+    r_onof: r_onof      # R Phase Buttons
+    r_1: r_1
+    r_2: r_2
+    r_3: r_3
+    r_4: r_4
+    r_5: r_5
+    r_6: r_6
+    r_7: r_7
+    r_8: r_8
+    r_9: r_9
+    r_10: r_10
+    r_11: r_11
+
+    s_onof: s_onof      # S Phase Buttons
+    s_1: s_1
+    s_2: s_2
+    s_3: s_3
+    s_4: s_4
+    s_5: s_5
+    s_6: s_6
+    s_7: s_7
+    s_8: s_8
+    s_9: s_9
+    s_10: s_10
+    s_11: s_11
+
+    t_onof: t_onof      # T Phase Buttons
+    t_1: t_1
+    t_2: t_2
+    t_3: t_3
+    t_4: t_4
+    t_5: t_5
+    t_6: t_6
+    t_7: t_7
+    t_8: t_8
+    t_9: t_9
+    t_10: t_10
+    t_11: t_11
+
+    masteronof: masteronof
+
+
+    canvas.before:
+        Color:
+            rgba: (1, 1, 1, 1)
+        Rectangle:
+            pos:self.pos
+            size:self.size
+
+    FloatLayout:
+        Button:
+            id: masteronof
+            text:" Master\nON/OFF" # tüm on/off ları aynı anda açıp kapatıyor.
+            size_hint: 0.23,0.154
+            background_color: [166/255, 166/255, 166/255, 1]
+            pos_hint: {"x": 0.01, "y": 0.8276}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("{")
+                elif self.background_color == [146/255, 208/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("}")
+
+
+        Button:
+            text:"All ON"
+            size_hint: 0.114,0.154
+            background_color: [255/255, 70/255, 70/255, 1]
+            pos_hint: {"x": 0.01, "y": 0.6727}
+            on_release:
+                if generalcontrol.is_connected is True: generalcontrol.all_on_button()
+                if generalcontrol.is_connected is True: generalcontrol.send("*")
+        Button:
+            text:"RESET"
+            size_hint: 0.115,0.154
+            background_color: [255/255, 70/255, 70/255, 1]
+            pos_hint: {"x": 0.125, "y": 0.6727}
+            on_release:
+                if generalcontrol.is_connected is True: generalcontrol.reset_button()
+                if generalcontrol.is_connected is True: generalcontrol.send(",")
+
+        Label:
+            text: "Vout:"
+            pos_hint: {"x": 0, "y": 0.555}
+        LimitInput:
+            id: v
+            len: 0
+            on_text:
+                self.readonly = True if len(self.text.strip()) == 3 else False
+            on_text_validate: generalcontrol.send("q")
+            size_hint: 0.14,0.1032
+            pos_hint: {"x": 0.1, "y": 0.555}
+        Label:
+            text: "kVA/Faz:"
+            pos_hint: {"x": 0, "y": 0.4518}
+        LimitInput:
+            id: kva
+            on_text:
+                self.readonly = True if len(self.text.strip()) == 3 else False
+            size_hint: 0.14,0.1032
+            pos_hint: {"x": 0.1, "y": 0.4518}
+        Label:
+            text: "PF:"
+            pos_hint: {"x": 0, "y": 0.355}
+        LimitInput:
+            id: pf
+            on_text:
+                self.readonly = True if len(self.text.strip()) == 3 else False
+            size_hint: 0.14,0.1032
+            pos_hint: {"x": 0.1, "y": 0.355}
+
+        Button:
+            text:"Enter"
+            background_normal: "atlas://data/images/defaulttheme/button"
+            size_hint: 0.23,0.1
+            pos_hint: {"x": 0.01, "y": 0.1177}
+            on_release:
+                generalcontrol.percentage_init()
+
+        Button:
+            id: r_7
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.001,0.001
+            pos: 10001, 10001
+
+        Button:
+            id: r_8
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.00001,0.00001
+            pos: 10001, 10001
+
+        Button:
+            id: r_9
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.001,0.001
+            pos: 10001, 10001
+
+        Button:
+            id: r_10
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.001,0.001
+            pos: 10001, 10001
+
+        Button:
+            id: r_11
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.001,0.001
+            pos: 10001, 10001
+
+        Button:
+            id: s_7
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.001,0.001
+            pos: 10001, 10001
+
+        Button:
+            id: s_8
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.001,0.001
+            pos: 10001, 10001
+
+        Button:
+            id: s_9
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.001,0.001
+            pos: 10001, 10001
+
+        Button:
+            id: s_10
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.001,0.001
+            pos: 10001, 10001
+
+        Button:
+            id: s_11
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.001,0.001
+            pos: 10001, 10001
+
+        Button:
+            id: t_7
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.001,0.001
+            pos: 10001, 10001
+
+        Button:
+            id: t_8
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.001,0.001
+            pos: 10001, 10001
+
+        Button:
+            id: t_9
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.001,0.001
+            pos: 10001, 10001
+
+        Button:
+            id: t_10
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.001,0.001
+            pos: 10001, 10001
+
+        Button:
+            id: t_11
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.001,0.001
+            pos: 10001, 10001
+
+        Button:
+            text:"ON/OFF"
+            id: r_onof
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.25, "y": 0.8276}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("q")
+                elif self.background_color == [146/255, 208/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("Q")
+
+        Button:
+            text:"1,5A"
+            id: r_1
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.3733, "y": 0.8276}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("w")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("W")
+
+        Button:
+            text:"3A"
+            id: r_2
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.4966, "y": 0.8276}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("e")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("E")
+        Button:
+            id: r_3
+            text:"6A"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.6199, "y": 0.8276}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("r")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("R")
+        Button:
+            id: r_4
+            text:"9A"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.7432, "y": 0.8276}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("t")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("T")
+        Button:
+            id: r_5
+            text:"12A"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.8665, "y": 0.8276}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("y")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("Y")
+        Button:
+            id: r_6
+            text:"32A"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.25, "y": 0.6727}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("u")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("U")
+
+
+
+        Button:
+            id: s_onof
+            text:"ON/OFF"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.25, "y": 0.5001}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("f")
+                elif self.background_color == [146/255, 208/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("F")
+        Button:
+            id: s_1
+            text:"1,5A"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.3733, "y": 0.5001}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("g")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("G")
+        Button:
+            id: s_2
+            text:"3A"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.4966, "y": 0.5001}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("h")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("H")
+        Button:
+            id: s_3
+            text:"6A"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.6199, "y": 0.5001}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("j")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("J")
+        Button:
+            id: s_4
+            text:"9A"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.7432, "y": 0.5001}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("k")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("K")
+        Button:
+            id: s_5
+            text:"12A"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.8665, "y": 0.5001}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("l")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("L")
+        Button:
+            id: s_6
+            text:"32A"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.25, "y": 0.3452}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("i")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("I")
+
+
+
+        Button:
+            id: t_onof
+            text:"ON/OFF"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.25, "y": 0.1726}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("n")
+                elif self.background_color == [146/255, 208/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("N")
+        Button:
+            id: t_1
+            text:"1,5A"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.3733, "y": 0.1726}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("m")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("M")
+        Button:
+            id: t_2
+            text:"3A"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.4966, "y": 0.1726}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("1")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("!")
+        Button:
+            id: t_3
+            text:"6A"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.6199, "y": 0.1726}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("2")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("'")
+        Button:
+            id: t_4
+            text:"9A"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.7432, "y": 0.1726}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("3")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("^")
+        Button:
+            id: t_5
+            text:"12A"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.8665, "y": 0.1726}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("4")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("+")
+        Button:
+            id: t_6
+            text:"32A"
+            background_color: [166/255, 166/255, 166/255, 1]
+            size_hint: 0.1225,0.154
+            pos_hint: {"x": 0.25, "y": 0.0177}
+            on_release:
+                if self.background_color == [166/255, 166/255, 166/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("5")
+                elif self.background_color == [0/255, 176/255, 80/255, 1] and generalcontrol.is_connected is True: generalcontrol.send("%")
